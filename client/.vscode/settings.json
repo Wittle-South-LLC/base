@@ -1,0 +1,30 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "eslint.enable": true,
+    "eslint.options": {
+        "extends": "standard",
+        "installedESLint": true,
+        "env": {
+            "browser": true,
+            "node": true
+        },
+        "parserOptions": {
+            "ecmaVersion": 6,
+            "sourceType": "module",
+            "ecmaFeatures": {
+                "jsx": true
+            }
+        },
+        "plugins": [
+            "standard",
+            "promise",
+            "react"
+        ],
+        "rules": {
+            "react/jsx-uses-react": "error",
+            "react/jsx-uses-vars": "error",
+            "react/prefer-es6-class": "error"
+        },
+        "workingDirectories": ["./src"]
+    }
+}
