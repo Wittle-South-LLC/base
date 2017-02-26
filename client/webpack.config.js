@@ -105,8 +105,17 @@ var config = {
         loader: 'babel-loader',
         exclude: routeComponentRegex,
         query: {
-          cacheDirectory: true,
-          presets: ['react', 'es2015']
+//          cacheDirectory: true,
+          presets: ['react', 'es2015'],
+          env: {
+            development: {
+              plugins: [
+                ['react-intl', {
+                  messagesDir: './docroot/messages/'
+                }]
+              ]
+            }
+          }
         }
       },
       // Loader specification for JSX files that are named routes
@@ -116,7 +125,17 @@ var config = {
       {
         test: routeComponentRegex,
         include: APP_DIR,
-        loaders: ['bundle-loader?lazy', 'babel-loader?presets[]=react,presets[]=es2015']
+//        loaders: ['bundle-loader?lazy', 'babel-loader?presets[]=react,presets[]=es2015']
+        loaders: ['bundle-loader?lazy', 'babel-loader?' + JSON.stringify({
+          presets: ['react', 'es2015'],
+          env: {
+            development: {
+              plugins: [
+                ['react-intl', { messagesDir: './docroot/messages' }]
+              ]
+            }
+          }
+        })]
       },
       // Loader specification for .js files, assumes they are ES6 / ES2015
       {

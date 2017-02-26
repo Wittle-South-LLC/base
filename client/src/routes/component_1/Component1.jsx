@@ -1,5 +1,6 @@
 /* Component1.jsx - Testing my component approach */
 import React from 'react'
+import { Col } from 'react-bootstrap'
 import SidebarC1 from './components/SidebarC1'
 
 export default class extends React.Component {
@@ -15,12 +16,10 @@ export default class extends React.Component {
     return (
       <div>
         <SidebarC1 />
-        {this.props.children}
+        <Col md={10}>
+          {this.props.children}
+        </Col>
       </div>
     )
   }
 }
-
-/*
-        {children}
-*/

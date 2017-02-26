@@ -1,0 +1,20 @@
+/* index.css - Overall site style */
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  color: #333;
+  background: #333;
+  overflow-x: hidden;
+}

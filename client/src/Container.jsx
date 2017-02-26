@@ -1,6 +1,9 @@
 // Container.jsx - The application container for the top level route
 import React from 'react'
-import { Grid } from 'react-bootstrap'
+import { Grid, Row } from 'react-bootstrap'
+import SiteMenu from './components/SiteMenu'
+import { setMessage } from './state/fetchStatus/reducer'
+import { intlShape, defineMessages } from 'react-intl'
 
 /* Container will receive the Redux store via props, and will set
  * its state to the current store. The container also puts the
@@ -12,16 +15,43 @@ import { Grid } from 'react-bootstrap'
  * container (which should be all of them if the routes are built
  * correctly) */
 export default class Container extends React.Component {
-  constructor (props) {
-    super(props)
+  constructor (props, context) {
+    super(props, context)
+    console.log('context = ', context)
+
     // Method passed to store.subscribe, is called for each state change
     this.listenStore = this.listenStore.bind(this)
+    this.init = this.init.bind(this)
+
     // Will be set when subscribe is called
     this.unsubscribe = undefined
+
+    // Define the localized messages owned by this component
+    this.componentText = defineMessages({
+      navHomeLink: { id: 'container.home_link', defaultMessage: 'Home' },
+      navUserLink: { id: 'container.user_link', defaultMessage: 'User' },
+      navComponent1Link: { id: 'container.component_1_link', defaultMessage: 'Component 1' },
+      enLocaleDesc: { id: 'container.en_locale_description', defaultMessage: 'English' },
+      frLocaleDesc: { id: 'container.fr_locale_description', defaultMessage: 'French' },
+      containerGreetingStatus: {
+        id: 'container.greeting_status',
+        defaultMessage: 'Simple and effective structure for applications'
+      },
+      containerTitle: {
+        id: 'container.title',
+        defaultMessage: 'Application Structure Playground'
+      }
+    })
+    // Set the initial status message for newly activated application
+//    setMessage('Simple and effective structure for applications')
+    this.props.route.store.dispatch(setMessage(this.componentText.containerGreetingStatus))
+
     // Initialize the state to the current store state
     this.state = {
       reduxState: props.route.store.getState()
     }
+    this.currentLocale = props.route.getCurrentLocale()
+    this.init()
   }
   // Put the Redux state and dispatch method into context
   getChildContext () {
@@ -29,6 +59,22 @@ export default class Container extends React.Component {
       reduxState: this.props.route.store.getState(),
       dispatch: this.props.route.store.dispatch
     }
+  }
+  init () {
+    console.log('init()')
+    // Define the locales we will support; needs to be done in render because locale can change
+    this.availableLocales = [
+      {localeCode: 'en', localeDesc: this.context.intl.formatMessage(this.componentText.enLocaleDesc)},
+      {localeCode: 'fr', localeDesc: this.context.intl.formatMessage(this.componentText.frLocaleDesc)}
+    ]
+
+    // Define the site-level navigation options that correspond to the routes shown above; needs to be done
+    // in render because locales can change
+    this.navOptions = [
+      { path: '/home', label: this.context.intl.formatMessage(this.componentText.navHomeLink) },
+      { path: '/user', label: this.context.intl.formatMessage(this.componentText.navUserLink) },
+      { path: '/component_1', label: this.context.intl.formatMessage(this.componentText.navComponent1Link) }
+    ]
   }
   // After Container mounts initially, subscribe to store updates
   // and save the unsubscribe callback for when the component is
@@ -48,13 +94,45 @@ export default class Container extends React.Component {
   }
   // Render the container and its children
   render () {
+    let locale = this.props.route.getCurrentLocale()
+    if (locale !== this.currentLocale) {
+      console.log('New locale detected in render')
+      this.init()
+    }
     return (
-      <Grid fluid={true} id="appName">
-        <h4>Container Grid</h4>
-        {this.props.children}
-      </Grid>
+      <SiteMenu title={this.context.intl.formatMessage(this.componentText.containerTitle)}
+                navOptions={this.navOptions}
+                availableLocales={this.availableLocales}
+                changeLocale={this.props.route.changeLocale}
+                currentLocale={locale}
+                message={this.context.intl.formatMessage(this.state.reduxState.getIn(['fetchStatus', 'message']))}>
+        <Grid fluid={true} id="appName">
+          <Row>
+            {this.props.children}
+          </Row>
+        </Grid>
+      </SiteMenu>
     )
   }
+}
+
+/*
+    <div className='fullwidth'>
+      <SiteMenu />
+      <div className={this.state.contentClass}>
+        <a className="button" onClick={this.onMenuToggle}></a>
+        <h1>Baseline Project</h1>
+        <h2>Simple and effective structure for applications</h2>
+        <Grid fluid={true} id="appName">
+          <h4>Container Grid</h4>
+          {this.props.children}
+        </Grid>
+      </div>
+    </div>
+*/
+
+Container.contextTypes = {
+  intl: intlShape.isRequired
 }
 
 // Define the types of child context the container will produce
