@@ -1,7 +1,7 @@
 /* baseApp.js - Application reducer for redux state */
 import { combineReducers } from 'redux-immutable'
-import { fetchStatus } from './fetchStatus/reducer'
-import { testStuff } from './testStuff/reducer'
+import { fetchStatus } from './fetchStatus/fetchStatusReducer'
+import { testStuff } from './testStuff/testStuffReducer'
 
 const baseApp = combineReducers({
   fetchStatus,

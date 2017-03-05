@@ -46,7 +46,7 @@ var config = {
     chunkFilename: 'js/[id].chunk.js',
     // publicPath is necessary to ensure that dynamic chunk loading happens from the
     // same directory rather than nested directories that align to the source structure
-    publicPath: '/'
+    publicPath: '/base/ui/'
   },
   // Setting for webpack-dev-server to make the browserHistory component of
   // react-router to work
@@ -63,7 +63,15 @@ var config = {
     // define environment-specific behavior
     new webpack.DefinePlugin({
       'process.env': {
-        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        // During build replace process.env.NODE_ENV with contents of NODE_ENV
+        // environment variable present when webpack was run
+        'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+        // During build replace process.env.URL_ROOT with contents of URL_ROOT
+        // environment variable present when webpack was run
+        'URL_ROOT': JSON.stringify(process.env.URL_ROOT),
+        // During build replace process.env.API_ROOT with contents of API_ROOT
+        // environment variable present when webpack was run
+        'API_ROOT': JSON.stringify(process.env.API_ROOT)
       }
     }),
     // Will auto-inject application version number from package.json, but

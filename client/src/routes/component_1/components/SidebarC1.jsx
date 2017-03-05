@@ -17,20 +17,20 @@ export default class SidebarC1 extends React.Component {
     })
   }
   onPage1Click (e) {
-    this.context.router.push('/component_1/Page1C1')
+    this.context.router.push(process.env.URL_ROOT + '/component_1/Page1C1')
   }
   onPage2Click (e) {
-    this.context.router.push('/component_1/Page2C1')
+    this.context.router.push(process.env.URL_ROOT + '/component_1/Page2C1')
   }
   onHomeClick (e) {
-    this.context.router.push('/home')
+    this.context.router.push(process.env.URL_ROOT + '/home')
   }
   render () {
     return (
       <Col md={2}>
         <p>{this.context.intl.formatMessage(this.componentText.pageName)}</p>
         <Button onClick={this.onPage1Click}>{this.context.intl.formatMessage(this.componentText.navPage1)}</Button>
-        <Button onClick={this.onPage2Click}>{this.context.intl.formatMessage(this.componentText.navPage1)}</Button>
+        <Button onClick={this.onPage2Click}>{this.context.intl.formatMessage(this.componentText.navPage2)}</Button>
       </Col>
     )
   }

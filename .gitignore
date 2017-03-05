@@ -8,6 +8,22 @@ pids
 *.pid
 *.seed
 
+# Virtual ENV files
+server/bin/**
+server/lib/**
+server/man/**
+server/include/**
+
+# pip files
+pip-selfcheck.json
+
+# Server python artifacts
+server/.Python
+server/src/__pycache__
+server/src/DataModel/__pycache__
+server/src/APIs/__pycache__
+server/tests/__pycache__
+
 # Generated output from webpack
 client/docroot/**
 
@@ -16,6 +32,10 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
+.coverage
+
+# OS X artifacts
+.DS_Store
 
 # nyc test coverage
 .nyc_output

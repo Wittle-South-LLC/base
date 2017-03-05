@@ -1,0 +1,122 @@
+/* fetchStatusActions.js - fetch status actions */
+import fetch from 'isomorphic-fetch'
+
+export const PRE_FETCH = 'PRE_FETCH'
+export const FETCH_START = 'FETCH_START'
+export const FETCH_SUCCESS = 'FETCH_SUCCESS'
+export const FETCH_ERROR = 'FETCH_ERROR'
+export const SET_MESSAGE = 'SET_MESSAGE'
+export const TRANSITION_TO = 'TRANSITION_TO'
+
+// Function to set the status message manually where needed
+export function setMessage (message, messageType = 'status') {
+  return { type: SET_MESSAGE, messageType, message }
+}
+
+// Function to set a next path if needed
+export function setNewPath (newPath) {
+  return { type: TRANSITION_TO, newPath }
+}
+
+/* Handle the mechanics of asynchronous fetching, including error checking,
+   using the contents of the payload structure. This structure must include the
+   following members:
+   - apiUrl        => The (relative) url path to call
+   - method        => String indicating HTTP method to use (GET, POST, PUT, DELETE)
+   - type          => type of action
+   - sendData      => Data associated with the action to fetch, sent to server
+*/
+
+export function fetchReduxAction (payload, username = undefined, password = undefined, successPath = undefined) {
+  return (dispatch, getState) => {
+    /* If we didn't get a username and password, it is because we're supposed to get that from state */
+    if (username === undefined) {
+      username = getState().getIn(['user', 'token'])
+      password = 'unused'
+    }
+    dispatch(fetchStart(payload.type, payload.sendData))
+    let headers
+    switch (payload.method) {
+      /* GET does not have payloads */
+      case 'GET':
+        headers = getApiHeaders(payload.method, username, password)
+        break
+      /* PUT, POST, and DELETE all have payloads */
+      case 'DELETE':
+      case 'PUT':
+      case 'POST':
+        headers = getApiHeaders(payload.method, username, password, JSON.stringify(payload.sendData))
+        break
+      default:
+        throw new Error('fetchReduxAction: Invalid or mssing method in payload')
+    }
+    if (payload.method !== 'DELETE') {
+      return fetch(process.env.API_ROOT + payload.apiUrl, headers)
+        .then(response => {
+          if (response.ok) {
+            return response.json()
+          } else if (response.status === 401) {
+            throw new Error('Invalid username/password combination')
+          } else if (response.status === 500) {
+            throw new Error('Unknown server error')
+          } else {
+            throw new Error('Unkown error from the server with code: ' + response.status.toString())
+          }
+        })
+        .then(json => dispatch(fetchSuccess(payload.type, payload.sendData, json, successPath)))
+        .catch(error => dispatch(fetchError(payload.type, payload.sendData, error.message)))
+    } else {
+      return fetch(process.env.API_ROOT + payload.apiUrl, headers)
+        .then(response => {
+          if (response.ok) {
+            return dispatch(fetchSuccess(payload.type, payload.sendData, successPath))
+          } else if (response.status === 401) {
+            throw new Error('Invalid username/password combination')
+          } else if (response.status === 500) {
+            throw new Error('Unknown server error')
+          } else {
+            throw new Error('Unkown error from the server with code: ' + response.status.toString())
+          }
+        })
+        .catch(error => dispatch(fetchError(payload.type, payload.sendData, error.message)))
+    }
+  }
+}
+
+/* Redux action for all fetch starts */
+function fetchStart (type, sendData) {
+  return { type, status: FETCH_START, sendData }
+}
+
+/* Redux action for all fetch errors */
+function fetchError (type, sendData, message) {
+  return { type, status: FETCH_ERROR, sendData, message }
+}
+
+/* Redux action for all fetch successes */
+function fetchSuccess (type, sendData, receivedData, nextPath) {
+  return { type, status: FETCH_SUCCESS, sendData, receivedData, nextPath }
+}
+
+/* Construct an HTTP basic authentication header given a username and password */
+function getAuthstring (username, password) {
+  return 'Basic ' +
+    new Buffer(unescape(encodeURIComponent(username)) + ':' +
+               unescape(encodeURIComponent(password))).toString('base64')
+}
+
+/* Construct the payload argument to fetch given the HTTP method,
+   authentication information, and optional body */
+function getApiHeaders (httpMethod, username, password, body = undefined) {
+  const result = {
+    'method': httpMethod,
+    'headers': {
+      'Authorization': getAuthstring(username, password),
+      'Content-Type': 'application/json'
+    }
+  }
+  if (body !== undefined) {
+    result['body'] = body
+  }
+  return result
+}

@@ -11,6 +11,8 @@ import fr from 'react-intl/locale-data/fr'
 import baseApp from './state/baseApp'
 import Container from './Container'
 import Home from './routes/Home'
+import Login from './routes/Login'
+import Register from './routes/Register'
 import User from './routes/User'
 import Component1 from './routes/component_1/Component1'
 import Page1C1 from './routes/component_1/routes/Page1C1'
@@ -22,7 +24,6 @@ let defaultLocaleData = {}
 export class App extends React.Component {
   constructor (props, context) {
     super(props, context)
-    console.log('App Context = ', context)
 
     // Bind the two helper methods for dynamic loading of components
     this.lazyLoadComponent = this.lazyLoadComponent.bind(this)
@@ -63,14 +64,17 @@ export class App extends React.Component {
              changeLocale={this.changeLocale}
              getCurrentLocale={this.getLocale}>
         <IndexRedirect to={'/home'} />
-        <Route path={'/home'} getComponent={ this.lazyLoadComponent(Home) } />
-        <Route path={'/user'} getComponent={ this.lazyLoadComponent(User) } />
-        <Route path={'/component_1'} getComponent={ this.lazyLoadComponent(Component1) } >
+        <Route path={process.env.URL_ROOT + '/home'} getComponent={ this.lazyLoadComponent(Home) }>
+          <Route path={'login'} getComponent= { this.lazyLoadComponent(Login)} />
+          <Route path={'register'} getComponent= { this.lazyLoadComponent(Register)} />
+        </Route>
+        <Route path={process.env.URL_ROOT + '/user'} getComponent={ this.lazyLoadComponent(User) } />
+        <Route path={process.env.URL_ROOT + '/component_1'} getComponent={ this.lazyLoadComponent(Component1) } >
           <IndexRedirect to={'Page1C1'} />
           <Route path={'Page1C1'} getComponent={ this.lazyLoadComponent(Page1C1) } />
           <Route path={'Page2C1'} getComponent={ this.lazyLoadComponent(Page2C1) } />
         </Route>
-        <Redirect from='*' to={'/home'} />
+        <Redirect from='*' to={process.env.URL_ROOT + '/home'} />
       </Route>
 
     this.localeData = defaultLocaleData
@@ -86,7 +90,7 @@ export class App extends React.Component {
   loadLocale (loc) {
     let _self = this
     // This code should initialize the locale based on the actual locale
-    fetch(`/lang/${loc}.json`)
+    fetch(process.env.URL_ROOT + `/lang/${loc}.json`)
       .then((res) => {
         if (res.status >= 400) {
           throw new Error('Bad response from server');
@@ -104,7 +108,6 @@ export class App extends React.Component {
       })
   }
   changeLocale (loc) {
-    console.log('Changing locale to: ', loc.target.value)
     this.loadLocale(loc.target.value)
   }
   setLocale (loc) {
@@ -148,7 +151,7 @@ App.contextTypes = {
 }
 */
 
-fetch(`/lang/en.json`)
+fetch(process.env.URL_ROOT + `/lang/en.json`)
   .then((res) => {
     if (res.status >= 400) {
       throw new Error('Bad response from server')

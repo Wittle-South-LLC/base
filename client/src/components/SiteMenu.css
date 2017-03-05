@@ -1,9 +1,11 @@
 /* SiteMenu.css - CSS for Site Menu */
-@import url('http://netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css');
+@import url('http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css');
 
 .sidebar {
   position: absolute;
-  background: #333;
+/*  background: #333; */
+  background: #50729f;
+  min-height: 100%;
   width: 220px;
 }
 
@@ -14,8 +16,10 @@
   text-transform: uppercase;
   letter-spacing: 7px;
   color: #eee;
-  border-bottom: 1px solid #222;
-  background: #2a2a2a;
+/*  border-bottom: 1px solid #222;
+  background: #2a2a2a; */
+  border-bottom: 1px solid lightgrey;
+  background: #506987;
 }
 
 .nav li a {
@@ -24,7 +28,8 @@
   padding: 15px 15px 15px 50px;
   font-size: 12px;
   color: #eee;
-  border-bottom: 1px solid #222;
+/*  border-bottom: 1px solid #222; */
+  border-bottom: 1px solid lightgrey;
 }
 
 .nav li a:before {
@@ -34,28 +39,26 @@
   left: 20px;
 }
 
-.nav li:nth-child(1) a:before { content: '\f00a'; }
-.nav li:nth-child(2) a:before { content: '\f012'; }
-.nav li:nth-child(3) a:before { content: '\f0e8'; }
-.nav li:nth-child(4) a:before { content: '\f0c3'; left: 23px; }
+.nav li.home a:before { content: '\f015' }
+.nav li.user a:before { content: '\f2c0'}
 
 .nav li a:hover {
-  background: #444;
+/*  background: #444; */
+  background: #A2B5CD;
+  color: black;
 }
 
 .nav li a.active {
   box-shadow: inset 5px 0 0 #5b5, inset 6px 0 0 #222;
-  background: #444;
+/*  background: #444; */
+  background: #A2B5CD;
+  color: black;
 }
 
 /* Container.css stuff */
-.wrapper {
+.wsv-container {
   display: flex;
   min-height: 100%;
-  min-width: 100%;
-}
-
-.fullwidth {
   min-width: 100%;
 }
 
@@ -81,9 +84,10 @@
 
 .button:before {
   content: '\f0c9';
-  font: 42px fontawesome;
+  font: 32px fontawesome;
 }
 
+/*
 h1 {
   display: inline;
   padding-left: 20px;
@@ -91,12 +95,36 @@ h1 {
   font-size: 28px;
   font-weight: 400;
 }
+*/
 
+.appTitle {
+  padding-left: 20px;
+  margin: 25px 0 15px;
+  font-size: 28px;
+  font-weight: 400;
+}
+
+.appMessage {
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.appMessage.status {
+  color: #999;
+}
+
+.appMessage.error {
+  color: red;
+}
+
+/*
 h2 {
   font-size: 18px;
   font-weight: 400;
   color: #999;
 }
+*/
 
 .titlebarRight {
   float: right;
@@ -105,5 +133,18 @@ h2 {
 .authenticateLink {
   text-align: right;
   font-size: 12px;
-  color: darkblue;
+}
+
+.languageSelect {
+  padding-right: 10px;
+  margin-right: 10px;
+}
+
+.titlelink {
+  text-decoration: underline;
+}
+
+.titleor {
+  padding-right: 5px;
+  padding-left: 5px;
 }

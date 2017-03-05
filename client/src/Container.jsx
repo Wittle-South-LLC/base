@@ -17,7 +17,6 @@ import { intlShape, defineMessages } from 'react-intl'
 export default class Container extends React.Component {
   constructor (props, context) {
     super(props, context)
-    console.log('context = ', context)
 
     // Method passed to store.subscribe, is called for each state change
     this.listenStore = this.listenStore.bind(this)
@@ -61,7 +60,6 @@ export default class Container extends React.Component {
     }
   }
   init () {
-    console.log('init()')
     // Define the locales we will support; needs to be done in render because locale can change
     this.availableLocales = [
       {localeCode: 'en', localeDesc: this.context.intl.formatMessage(this.componentText.enLocaleDesc)},
@@ -71,9 +69,9 @@ export default class Container extends React.Component {
     // Define the site-level navigation options that correspond to the routes shown above; needs to be done
     // in render because locales can change
     this.navOptions = [
-      { path: '/home', label: this.context.intl.formatMessage(this.componentText.navHomeLink) },
-      { path: '/user', label: this.context.intl.formatMessage(this.componentText.navUserLink) },
-      { path: '/component_1', label: this.context.intl.formatMessage(this.componentText.navComponent1Link) }
+      { path: process.env.URL_ROOT + '/home', class: 'home', label: this.context.intl.formatMessage(this.componentText.navHomeLink) },
+      { path: process.env.URL_ROOT + '/user', class: 'user', label: this.context.intl.formatMessage(this.componentText.navUserLink) },
+      { path: process.env.URL_ROOT + '/component_1', label: this.context.intl.formatMessage(this.componentText.navComponent1Link) }
     ]
   }
   // After Container mounts initially, subscribe to store updates
@@ -96,7 +94,7 @@ export default class Container extends React.Component {
   render () {
     let locale = this.props.route.getCurrentLocale()
     if (locale !== this.currentLocale) {
-      console.log('New locale detected in render')
+      this.currentLocale = locale
       this.init()
     }
     return (
@@ -105,6 +103,7 @@ export default class Container extends React.Component {
                 availableLocales={this.availableLocales}
                 changeLocale={this.props.route.changeLocale}
                 currentLocale={locale}
+                messageType={this.state.reduxState.getIn(['fetchStatus', 'messageType'])}
                 message={this.context.intl.formatMessage(this.state.reduxState.getIn(['fetchStatus', 'message']))}>
         <Grid fluid={true} id="appName">
           <Row>

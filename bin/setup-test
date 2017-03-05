@@ -1,0 +1,6 @@
+#!/bin/bash
+export TEST_BASE_CONNECT="mysql+mysqldb://base:onlyeric@localhost/base?charset=utf8mb4"
+export TEST_BASE_SECRET_KEY="b'2a3e134585cc2b501066a2635bcb99e6f5ba018a5d63d08a'"
+export URL_ROOT='/base/ui'
+export API_ROOT='/base/api'
+export NODE_ENV='development'

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "webpack -d --devtool='source-map' --watch",
     "build": "webpack -p --aiv-log-none",
-    "test": "mocha --require ignore-styles --compilers js:babel-register",
+    "test": "MESSAGE_LEVEL='debug' mocha --require ignore-styles --compilers js:babel-register",
     "mocha": "mocha --require ignore-styles --compilers js:babel-register",
     "cover": "nyc _mocha --require ignore-styles --compilers js:babel-register ",
     "build:langs": "babel scripts/translate.js | node"
