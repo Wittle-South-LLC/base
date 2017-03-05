@@ -8,6 +8,10 @@ export const FETCH_ERROR = 'FETCH_ERROR'
 export const SET_MESSAGE = 'SET_MESSAGE'
 export const TRANSITION_TO = 'TRANSITION_TO'
 
+export const MSG_INVALID_CREDENTIALS = 'INVALID_CREDENTIALS'
+export const MSG_UNKNOWN_SERVER_ERROR = 'UNKNOWN_SERVER_ERROR'
+export const MSG_OTHER_FETCH_ERROR = 'OTHER_FETCH_ERROR = '
+
 // Function to set the status message manually where needed
 export function setMessage (message, messageType = 'status') {
   return { type: SET_MESSAGE, messageType, message }
@@ -50,36 +54,29 @@ export function fetchReduxAction (payload, username = undefined, password = unde
       default:
         throw new Error('fetchReduxAction: Invalid or mssing method in payload')
     }
-    if (payload.method !== 'DELETE') {
-      return fetch(process.env.API_ROOT + payload.apiUrl, headers)
-        .then(response => {
-          if (response.ok) {
-            return response.json()
-          } else if (response.status === 401) {
-            throw new Error('Invalid username/password combination')
-          } else if (response.status === 500) {
-            throw new Error('Unknown server error')
-          } else {
-            throw new Error('Unkown error from the server with code: ' + response.status.toString())
-          }
-        })
-        .then(json => dispatch(fetchSuccess(payload.type, payload.sendData, json, successPath)))
-        .catch(error => dispatch(fetchError(payload.type, payload.sendData, error.message)))
+    return fetch(process.env.API_ROOT + payload.apiUrl, headers)
+      .then(response => checkResponse(payload.method, response))
+      .then(json => dispatch(fetchSuccess(payload.type, payload.sendData, json, successPath)))
+      .catch(error => dispatch(fetchError(payload.type, payload.sendData, error.message)))
+  }
+}
+
+/* Check the response code and throw appropriate & consistent errors that
+   can be localized in the UI if desired */
+function checkResponse (httpVerb, response) {
+  if (response.ok) {
+    // The HTTP protocol doesn't allow payload for DELETE verb, so there will be no JSON
+    if (httpVerb !== 'DELETE') {
+      return response.json()
     } else {
-      return fetch(process.env.API_ROOT + payload.apiUrl, headers)
-        .then(response => {
-          if (response.ok) {
-            return dispatch(fetchSuccess(payload.type, payload.sendData, successPath))
-          } else if (response.status === 401) {
-            throw new Error('Invalid username/password combination')
-          } else if (response.status === 500) {
-            throw new Error('Unknown server error')
-          } else {
-            throw new Error('Unkown error from the server with code: ' + response.status.toString())
-          }
-        })
-        .catch(error => dispatch(fetchError(payload.type, payload.sendData, error.message)))
+      return undefined
     }
+  } else if (response.status === 401) {
+    throw new Error(MSG_INVALID_CREDENTIALS)
+  } else if (response.status === 500) {
+    throw new Error(MSG_UNKNOWN_SERVER_ERROR)
+  } else {
+    throw new Error(MSG_OTHER_FETCH_ERROR + response.status.toString())
   }
 }
 
