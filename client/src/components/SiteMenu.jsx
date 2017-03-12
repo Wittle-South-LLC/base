@@ -1,11 +1,13 @@
 // SiteMenu.jsx - Implements a site-wide menu
 import React from 'react'
 import { intlShape, defineMessages } from 'react-intl'
+import { logoutUser } from '../state/user/userActions'
 import './SiteMenu.css'
 
 export default class SiteMenu extends React.Component {
   constructor (props, context) {
     super(props)
+    this.onLogoutClick = this.onLogoutClick.bind(this)
     this.onMenuToggle = this.onMenuToggle.bind(this)
     this.onMenuClick = this.onMenuClick.bind(this)
     this.onSignInClick = this.onSignInClick.bind(this)
@@ -13,12 +15,17 @@ export default class SiteMenu extends React.Component {
     this.componentText = defineMessages({
       signInText: { id: 'SiteMenu.signInText', defaultMessage: 'Sign in' },
       orText: { id: 'SiteMenu.orText', defaultMessage: 'or' },
-      registerText: { id: 'SiteMenu.registerText', defaultMessage: 'Register' }
+      registerText: { id: 'SiteMenu.registerText', defaultMessage: 'Register' },
+      welcomeText: { id: 'SiteMenu.welcomeText', defaultMessage: 'Welcome {username}!' },
+      logoutText: { id: 'SiteMenu.logoutText', defaultMessage: 'Sign out' }
     })
     this.state = {
       contentClass: 'content',
       activePath: process.env.URL_ROOT + '/home'
     }
+  }
+  onLogoutClick (e) {
+    this.context.dispatch(logoutUser())
   }
   onSignInClick (e) {
     this.setState({
@@ -52,6 +59,26 @@ export default class SiteMenu extends React.Component {
              onClick={this.onMenuClick.bind(undefined, option.path)}>{option.label}</a>
         </li>)
       : []
+    let userHeader = this.context.reduxState.getIn(['user', 'token']) !== undefined
+      ? <div className='loggedIn'>
+          <span className='titleor'>
+            {this.context.intl.formatMessage(this.componentText.welcomeText, {username: this.context.reduxState.getIn(['user', 'username'])})}
+          </span>
+          <span onClick={this.onLogoutClick} className='titlelink'>
+            {this.context.intl.formatMessage(this.componentText.logoutText)}
+          </span>
+        </div>
+      : <div className='notLoggedIn'>
+          <span onClick={this.onSignInClick} className='titlelink'>
+            {this.context.intl.formatMessage(this.componentText.signInText)}
+          </span>
+          <span className='titleor'>
+            {this.context.intl.formatMessage(this.componentText.orText)}
+          </span>
+          <span onClick={this.onRegisterClick} className='titlelink'>
+           {this.context.intl.formatMessage(this.componentText.registerText)}
+          </span>
+        </div>
     return (
       <div className="wsv-container">
         <div className="sidebar">
@@ -67,15 +94,7 @@ export default class SiteMenu extends React.Component {
                 <option key={locale.localeCode} value={locale.localeCode}>{locale.localeDesc}</option>
               )}
             </select>
-            <span onClick={this.onSignInClick} className='titlelink'>
-              {this.context.intl.formatMessage(this.componentText.signInText)}
-            </span>
-            <span className='titleor'>
-              {this.context.intl.formatMessage(this.componentText.orText)}
-            </span>
-            <span onClick={this.onRegisterClick} className='titlelink'>
-              {this.context.intl.formatMessage(this.componentText.registerText)}
-            </span>
+            {userHeader}
           </div>
           <a className="button" onClick={this.onMenuToggle}></a>
           <span className='appTitle'>{this.props.title}</span>
@@ -102,6 +121,7 @@ export default class SiteMenu extends React.Component {
 */
 
 SiteMenu.contextTypes = {
+  dispatch: React.PropTypes.func,
   reduxState: React.PropTypes.object,
   router: React.PropTypes.object,
   intl: intlShape

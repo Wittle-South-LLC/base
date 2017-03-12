@@ -3,6 +3,7 @@ import React from 'react'
 import { Col, ControlLabel, Form, FormControl, Panel, Row } from 'react-bootstrap'
 import { intlShape, defineMessages } from 'react-intl'
 import PanelHeader from '../components/PanelHeader'
+import { loginUser } from '../state/user/userActions'
 import './Login.css'
 
 export default class Login extends React.Component {
@@ -25,8 +26,8 @@ export default class Login extends React.Component {
     })
   }
   loginUser (e) {
-    console.log('Logging in user')
     e.preventDefault()
+    this.context.dispatch(loginUser(document.loginForm.userName.value, document.loginForm.password.value, '/home'))
   }
   render () {
     let formatMessage = this.context.intl.formatMessage
@@ -71,5 +72,7 @@ export default class Login extends React.Component {
 }
 
 Login.contextTypes = {
+  reduxState: React.PropTypes.object,
+  dispatch: React.PropTypes.func,
   intl: intlShape
 }

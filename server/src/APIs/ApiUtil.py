@@ -39,3 +39,16 @@ def validate_json_contains(api_method, request, fields, code=400):
             return None, api_message(api_method, API_REQUIRES_FIELDS.format(fields), code)
     # If all required fields are present, return the json with no error message
     return json, None
+
+def wrap_with_links(obj, links, val, root_path, many=False):
+    """Adds links key to object (first argument) based on links dictionary and value"""
+    if many:
+        for item in obj:
+            item['links'] = {}
+            for key in links:
+                item['links'][key] = root_path + links[key].format(item[val])
+    else:
+        obj['links'] = {}
+        for key in links:
+            obj['links'][key] = root_path + links[key].format(obj[val])
+    return obj

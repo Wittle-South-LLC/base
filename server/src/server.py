@@ -2,13 +2,16 @@
 import os.path
 # import pprint
 import logging
+import json
 # from logging.handlers import TimedRotatingFileHandler
 from flask import Flask, request, g, abort
 from flask_restful import Api
 from sqlalchemy import create_engine, event, exc, select
 from sqlalchemy.orm import sessionmaker
+from apispec.compat import iteritems
+from src.APIs.baseAPI import BASE_SPEC
 from src.APIs.ApiUtil import API_REQUIRES_JSON
-from src.APIs.UserAPIs import UserRes, UsersRes
+from src.APIs.UserAPIs import UserRes, USER_API_PATH, UsersRes, USERS_API_PATH
 from src.APIs.AuthorizeAPIs import GetAuthToken, LoginViaFacebook, GetLogin
 
 # Instatiate the Flask app
@@ -45,8 +48,8 @@ API.add_resource(LoginViaFacebook, '/fb_login')
 API.add_resource(GetLogin, '/login')
 
 # User API endpoints
-API.add_resource(UsersRes, '/users')
-API.add_resource(UserRes, '/user/<int:user_id>', endpoint='/user')
+API.add_resource(UsersRes, USERS_API_PATH)
+API.add_resource(UserRes, USER_API_PATH)
 
 # Need to make sure that the use of the database session is
 # scoped to the request to avoid open orm transactions between requests
@@ -103,3 +106,19 @@ def shutdown():
     """API Endpoing to call shut down server """
     shutdown_server()
     return 'Server shutting down...\n'
+
+@APP.route('/api-docs', methods=['GET'])
+def docs():
+    return json.dumps(BASE_SPEC.to_dict(), indent=4)
+
+@APP.route('/view-funcs', methods=['GET'])
+def views():
+    ret = ['<ul>']
+    view_funcs = APP.view_functions
+    for ep, view_func in iteritems(view_funcs):
+        ret.append('<li>View Function = ' + view_func.__name__ + ', ep = ' + ep + '<ul>')
+        for rule in APP.url_map._rules_by_endpoint[ep]:
+            ret.append('<li>' + rule.rule + '</li>')
+        ret.append('</ul></li>')
+    ret.append('</ul>')
+    return "".join(ret)

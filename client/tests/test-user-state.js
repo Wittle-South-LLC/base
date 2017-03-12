@@ -9,8 +9,8 @@ import expect from 'expect'
 import { isd, testAsync } from './TestUtils'
 import { loginUser, listUsers } from '../src/state/user/userActions'
 import { user } from '../src/state/user/userReducer'
-import { fetchStatus } from '../src/state/fetchStatus/fetchStatusReducer'
-import { MSG_INVALID_CREDENTIALS } from '../src/state/fetchStatus/fetchStatusActions'
+import { fetchStatus, componentText as fetchReducerText } from '../src/state/fetchStatus/fetchStatusReducer'
+import { componentText } from '../src/state/fetchStatus/fetchStatusActions'
 
 // Here's the application (for this test anyway) reducer
 const testUserState = combineReducers({ fetchStatus, user })
@@ -30,7 +30,9 @@ const stateLoginStart = initialState.setIn(['user', 'fetchingUser'], true)
                                     .setIn(['user', 'username'], 'testing')
 const stateLoginSuccess = initialState.setIn(['user', 'username'], 'testing')
                                       .setIn(['user', 'token'], 'token')
-const stateLoginFailed = initialState.setIn(['fetchStatus', 'message'], MSG_INVALID_CREDENTIALS)
+                                      .setIn(['fetchStatus', 'messageType'], 'status')
+                                      .setIn(['fetchStatus', 'message'], fetchReducerText.userLogin)
+const stateLoginFailed = initialState.setIn(['fetchStatus', 'message'], componentText.invalidCredentials)
                                      .setIn(['fetchStatus', 'messageType'], 'error')
 // List user states starting from successful login state
 const stateListUserStart = stateLoginSuccess.setIn(['user', 'list'], undefined)

@@ -2,7 +2,7 @@
 import React from 'react'
 import { Grid, Row } from 'react-bootstrap'
 import SiteMenu from './components/SiteMenu'
-import { setMessage } from './state/fetchStatus/reducer'
+import { setMessage } from './state/fetchStatus/fetchStatusActions'
 import { intlShape, defineMessages } from 'react-intl'
 
 /* Container will receive the Redux store via props, and will set
@@ -86,6 +86,10 @@ export default class Container extends React.Component {
   }
   // Callback method to receive state updates
   listenStore () {
+    // If the state update contains a route transition, execute it
+    if (this.props.route.store.getState().hasIn(['fetchStatus', 'transitionTo'])) {
+      this.context.router.push(this.props.route.store.getState().getIn(['fetchStatus', 'transitionTo']))
+    }
     this.setState({
       reduxState: this.props.route.store.getState()
     })
@@ -131,11 +135,12 @@ export default class Container extends React.Component {
 */
 
 Container.contextTypes = {
-  intl: intlShape.isRequired
+  intl: intlShape.isRequired,
+  router: React.PropTypes.object
 }
 
 // Define the types of child context the container will produce
 Container.childContextTypes = {
-  reduxState: React.PropTypes.object,
-  dispatch: React.PropTypes.func
+  dispatch: React.PropTypes.func,
+  reduxState: React.PropTypes.object
 }

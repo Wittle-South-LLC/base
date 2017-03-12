@@ -2,6 +2,7 @@
 import { fetchReduxAction, setNewPath } from '../fetchStatus/fetchStatusActions'
 
 export const LOGIN_USER = 'LOGIN_USER'
+export const LOGOUT_USER = 'LOUGOUT_USER'
 export const LIST_USERS = 'LIST_USERS'
 
 export function loginUser (username, password, nextPath = undefined) {
@@ -22,6 +23,10 @@ export function loginUser (username, password, nextPath = undefined) {
       }
     }
   }
+}
+
+export function logoutUser () {
+  return { type: LOGOUT_USER }
 }
 
 // Make an asynchronous call to get the list of users if it has not already been fetched

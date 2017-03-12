@@ -1,5 +1,5 @@
 import { Map, fromJS } from 'immutable'
-import { LOGIN_USER, LIST_USERS } from './userActions'
+import { LOGIN_USER, LIST_USERS, LOGOUT_USER } from './userActions'
 import { FETCH_START, FETCH_ERROR, FETCH_SUCCESS } from '../fetchStatus/fetchStatusActions'
 
 export function user (state = Map({ username: undefined, token: undefined }), action) {
@@ -20,6 +20,8 @@ export function user (state = Map({ username: undefined, token: undefined }), ac
           return state.set('list', fromJS(action.receivedData))
         default: return state
       }
+    case LOGOUT_USER:
+      return state.delete('list').set('username', undefined).set('token', undefined)
     default: return state
   }
 }

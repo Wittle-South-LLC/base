@@ -8,9 +8,16 @@ export const FETCH_ERROR = 'FETCH_ERROR'
 export const SET_MESSAGE = 'SET_MESSAGE'
 export const TRANSITION_TO = 'TRANSITION_TO'
 
-export const MSG_INVALID_CREDENTIALS = 'INVALID_CREDENTIALS'
-export const MSG_UNKNOWN_SERVER_ERROR = 'UNKNOWN_SERVER_ERROR'
-export const MSG_OTHER_FETCH_ERROR = 'OTHER_FETCH_ERROR = '
+// export const MSG_INVALID_CREDENTIALS = 'INVALID_CREDENTIALS'
+// export const MSG_UNKNOWN_SERVER_ERROR = 'UNKNOWN_SERVER_ERROR'
+// export const MSG_OTHER_FETCH_ERROR = 'OTHER_FETCH_ERROR = '
+import { defineMessages } from 'react-intl'
+
+export const componentText = defineMessages({
+  invalidCredentials: { id: 'fetchStatus.InvalidCredentials', defaultMessage: 'Invalid Credentials - please log in with a valid username and password' },
+  unknownServerError: { id: 'fetchStatus.UnknownServerError', defaultMessage: 'Unknown Server Error - please log out and refresh application' },
+  otherFetchError: { id: 'fetchStatus.OtherFetchError', defaultMessage: 'Error fetching information from server - please refresh application' }
+})
 
 // Function to set the status message manually where needed
 export function setMessage (message, messageType = 'status') {
@@ -57,7 +64,7 @@ export function fetchReduxAction (payload, username = undefined, password = unde
     return fetch(process.env.API_ROOT + payload.apiUrl, headers)
       .then(response => checkResponse(payload.method, response))
       .then(json => dispatch(fetchSuccess(payload.type, payload.sendData, json, successPath)))
-      .catch(error => dispatch(fetchError(payload.type, payload.sendData, error.message)))
+      .catch(error => dispatch(fetchError(payload.type, payload.sendData, error)))
   }
 }
 
@@ -72,11 +79,11 @@ function checkResponse (httpVerb, response) {
       return undefined
     }
   } else if (response.status === 401) {
-    throw new Error(MSG_INVALID_CREDENTIALS)
+    throw componentText.invalidCredentials
   } else if (response.status === 500) {
-    throw new Error(MSG_UNKNOWN_SERVER_ERROR)
+    throw componentText.unknownServerError
   } else {
-    throw new Error(MSG_OTHER_FETCH_ERROR + response.status.toString())
+    throw componentText.otherFetchError
   }
 }
 
