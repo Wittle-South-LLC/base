@@ -142,6 +142,7 @@ class UsersRes(Resource):
         if errors:
             return api_message(api_method, API_SCHEMA_ERRORS.format('User', 'create', errors), 400)
         current_app.logger.info('Creating user ' + user.username)
+        user.hash_password(json['password'])
         g.db_session.add(user)
         g.db_session.commit()
         return api_message(api_method, API_SUCCESS.format('User', 'created'), 201, user.user_id)

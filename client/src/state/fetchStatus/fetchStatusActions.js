@@ -16,6 +16,7 @@ import { defineMessages } from 'react-intl'
 export const componentText = defineMessages({
   invalidCredentials: { id: 'fetchStatus.InvalidCredentials', defaultMessage: 'Invalid Credentials - please log in with a valid username and password' },
   unknownServerError: { id: 'fetchStatus.UnknownServerError', defaultMessage: 'Unknown Server Error - please log out and refresh application' },
+  invalidRequest: { id: 'fetchStatus.InvalidRequest', defaultMessage: 'Erroneous API use, server validation failed' },
   otherFetchError: { id: 'fetchStatus.OtherFetchError', defaultMessage: 'Error fetching information from server - please refresh application' }
 })
 
@@ -78,6 +79,8 @@ function checkResponse (httpVerb, response) {
     } else {
       return undefined
     }
+  } else if (response.status === 400) {
+    throw componentText.invalidRequest
   } else if (response.status === 401) {
     throw componentText.invalidCredentials
   } else if (response.status === 500) {

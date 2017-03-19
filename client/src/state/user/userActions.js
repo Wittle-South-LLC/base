@@ -2,6 +2,7 @@
 import { fetchReduxAction, setNewPath } from '../fetchStatus/fetchStatusActions'
 
 export const LOGIN_USER = 'LOGIN_USER'
+export const REGISTER_USER = 'REGISTER_USER'
 export const LOGOUT_USER = 'LOUGOUT_USER'
 export const LIST_USERS = 'LIST_USERS'
 
@@ -13,6 +14,26 @@ export function loginUser (username, password, nextPath = undefined) {
         method: 'GET',
         type: LOGIN_USER,
         sendData: { username }
+      }
+      return dispatch(fetchReduxAction(payload, username, password, nextPath))
+    } else {
+      if (nextPath) {
+        return dispatch(setNewPath(nextPath))
+      } else {
+        return Promise.resolve()
+      }
+    }
+  }
+}
+
+export function registerUser (username, password, email, nextPath = undefined) {
+  return (dispatch, getState) => {
+    if (!getState().hasIn(['user', 'fetchingUser'])) {
+      let payload = {
+        apiUrl: '/users',
+        method: 'POST',
+        type: REGISTER_USER,
+        sendData: { username, password, email }
       }
       return dispatch(fetchReduxAction(payload, username, password, nextPath))
     } else {

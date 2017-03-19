@@ -72,7 +72,7 @@ export default class Login extends React.Component {
 }
 
 Login.contextTypes = {
-  reduxState: React.PropTypes.object,
   dispatch: React.PropTypes.func,
-  intl: intlShape
+  intl: intlShape,
+  reduxState: React.PropTypes.object
 }

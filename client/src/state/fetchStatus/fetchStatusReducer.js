@@ -1,13 +1,8 @@
 /* fetchStatusReducer.js - reducer for fetch status */
 import { Map } from 'immutable'
 import { SET_MESSAGE, FETCH_START, FETCH_SUCCESS, FETCH_ERROR, TRANSITION_TO } from './fetchStatusActions'
-import { LOGIN_USER, LOGOUT_USER } from '../user/userActions'
-import { defineMessages } from 'react-intl'
-
-export const componentText = defineMessages({
-  userLogout: { id: 'container.userLogout', defaultMessage: 'Logged out successfully' },
-  userLogin: { id: 'container.userLogin', defaultMessage: 'Welcome!' }
-})
+import { LOGIN_USER, LOGOUT_USER, REGISTER_USER } from '../user/userActions'
+import { userMessage } from '../user/userReducer'
 
 export function fetchStatus (state = Map({ fetching: false, message: undefined }), action) {
   if (action.type === SET_MESSAGE) {
@@ -16,7 +11,7 @@ export function fetchStatus (state = Map({ fetching: false, message: undefined }
     return state.set('transitionTo', action.nextPath)
   } else if (action.type === LOGOUT_USER) {
     return state.set('transitionTo', '/home')
-                .set('message', componentText.userLogout)
+                .set('message', userMessage(action))
                 .set('messageType', 'status')
   } else {
     switch (action.status) {
@@ -24,8 +19,8 @@ export function fetchStatus (state = Map({ fetching: false, message: undefined }
         return state.set('fetching', true).delete('transitionTo')
       case FETCH_SUCCESS:
         let newState = state.set('fetching', false)
-        if (action.type === LOGIN_USER) {
-          newState = newState.set('message', componentText.userLogin).set('messageType', 'status')
+        if (action.type === LOGIN_USER || action.type === REGISTER_USER) {
+          newState = newState.set('message', userMessage(action)).set('messageType', 'status')
         }
         if (action.nextPath) {
           newState = newState.set('transitionTo', action.nextPath)
