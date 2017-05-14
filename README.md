@@ -16,5 +16,7 @@ Some of the specific capabilities this will demonstrate when fully complete:
 * Clear comments within webpack configuration explaining the options used and their purpose - Done
 * Clear comments in index.jsx explaining how routes are set up and loaded - Done
 * Clear comments in Container.jsx explaining how changes in Redux store are made available to child components - Done
+* Global menu system that is less intrusive than default Bootstrap examples (invisible when not in use) - Done
+* Ability to self-register new users, prevening spammers via Captcha/Recaptcha - Done
 
 

@@ -1,15 +1,16 @@
 """UserAPIs.py - Provides APIs for CR and other operations on templates"""
+import requests
 from src.DataModel.User import User
 from flask import g, request, current_app
 from flask_restful import Resource
-from marshmallow import Schema, fields
 from marshmallow_sqlalchemy import ModelSchema
 from .AuthorizeAPIs import AUTH
 from .baseAPI import BASE_SPEC
 from .ApiUtil import api_message, validate_json_contains,\
                      wrap_with_links, \
                      API_CREATE_EXISTS, API_OBJECT_NOT_FOUND,\
-                     API_SCHEMA_ERRORS, API_SUCCESS
+                     API_SCHEMA_ERRORS, API_SUCCESS,\
+                     API_RECAPTCHA_FAILS
 
 # Path constants for APIs defined in this module
 BASE_USER_PATH = '/user'
@@ -20,6 +21,10 @@ USERS_API_PATH = '/users'
 USER_LINKS = {
     'self': BASE_USER_PATH + '/{}',
 }
+
+# API constants for Google ReCaptcha APIs
+RECAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
+RECAPTCHA_KEY = '6LcUlxgUAAAAAK5wC6dv6XEcJFvtIbmJsFwyE3Hb'
 
 # Marshmallow schema for model conversion to / from JSON
 class UserSchema(ModelSchema):
@@ -142,6 +147,15 @@ class UsersRes(Resource):
         if errors:
             return api_message(api_method, API_SCHEMA_ERRORS.format('User', 'create', errors), 400)
         current_app.logger.info('Creating user ' + user.username)
+        current_app.logger.debug('Google API Key: ' + json['reCaptchaResponse'])
+        current_app.logger.debug('Remote IP: ' + request.remote_addr)
+        resp = requests.post(RECAPTCHA_URL, data={
+            'secret': RECAPTCHA_KEY,
+            'response': json['reCaptchaResponse'],
+            'remoteip': request.remote_addr})
+        current_app.logger.debug('Google Post Response Status: ' + str(resp.status_code))
+        if resp.status_code >= 400 or not resp.json()['success']:
+            return api_message(api_method, API_RECAPTCHA_FAILS, 400)
         user.hash_password(json['password'])
         g.db_session.add(user)
         g.db_session.commit()

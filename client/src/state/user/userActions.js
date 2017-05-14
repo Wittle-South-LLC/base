@@ -26,14 +26,14 @@ export function loginUser (username, password, nextPath = undefined) {
   }
 }
 
-export function registerUser (username, password, email, nextPath = undefined) {
+export function registerUser (username, password, email, reCaptchaResponse, nextPath = undefined) {
   return (dispatch, getState) => {
     if (!getState().hasIn(['user', 'fetchingUser'])) {
       let payload = {
         apiUrl: '/users',
         method: 'POST',
         type: REGISTER_USER,
-        sendData: { username, password, email }
+        sendData: { username, password, email, reCaptchaResponse }
       }
       return dispatch(fetchReduxAction(payload, username, password, nextPath))
     } else {

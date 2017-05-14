@@ -3,12 +3,16 @@ import React from 'react'
 import { Col, ControlLabel, Form, FormControl, FormGroup, Row } from 'react-bootstrap'
 import PanelHeader from '../components/PanelHeader'
 import { intlShape, defineMessages } from 'react-intl'
+// import { Recaptcha } from 'react-recaptcha'
+var Recaptcha = require('react-recaptcha')
 import { registerUser } from '../state/user/userActions'
 import './Login.css'
 
 export default class Register extends React.Component {
   constructor (props, context) {
     super(props, context)
+    this.onLoadCallback = this.onLoadCallback.bind(this)
+    this.onVerifyCallback = this.onVerifyCallback.bind(this)
     this.registerUser = this.registerUser.bind(this)
     this.validInput = this.validInput.bind(this)
     this.state = {
@@ -27,12 +31,20 @@ export default class Register extends React.Component {
       olsSignupPassword2Placeholder: { id: 'Register.olsSignupPassword2Placeholder', defaultMessage: 'Repeat Password...' },
       olsSignupInstructions: { id: 'Register.olsSignupInstructions', defaultMessage: 'Please create a username and password' }
     })
+    this.reCaptchaResponse = undefined
+  }
+  onLoadCallback (e) {
+    console.log('ReCaptcha Loaded')
+  }
+  onVerifyCallback (response) {
+    this.reCaptchaResponse = response
   }
   registerUser (e) {
-    if (this.validInput()) {
+    if (this.validInput() && this.reCaptchaResponse) {
       this.context.dispatch(registerUser(document.registerForm.userName.value,
                                          document.registerForm.password1.value,
-                                         document.registerForm.emailAddress.value, '/home/login'))
+                                         document.registerForm.emailAddress.value,
+                                         this.reCaptchaResponse, '/home/login'))
       console.log('Register user')
     } else {
       console.log('Not registering user - invalid input')
@@ -103,8 +115,16 @@ export default class Register extends React.Component {
                     placeholder={formatMessage(this.componentText.olsSignupPassword2Placeholder)}/>
                 </FormGroup>
               </Col>
-              <input type="submit" id="hiddenSubmit"/>
-              <div className='loginInstructions'>{formatMessage(this.componentText.olsSignupInstructions)}</div>
+              <Col md={6}>
+                <Recaptcha sitekey="6LcUlxgUAAAAAGN7uFzcRZBkhdqlh_kC-D-UtYm9"
+                           render="explicit"
+                           onloadCallback={this.onLoadCallback}
+                           verifyCallback={this.onVerifyCallback} />
+              </Col>
+              <Col md={6}>
+                <input type="submit" id="hiddenSubmit"/>
+                <div className='loginInstructions'>{formatMessage(this.componentText.olsSignupInstructions)}</div>
+              </Col>
             </div>
           </div>
          </Form>

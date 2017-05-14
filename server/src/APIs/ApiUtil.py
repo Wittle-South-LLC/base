@@ -7,6 +7,7 @@ API_REQUIRES_FIELDS = 'Must provide {} for this API'
 API_CREATE_EXISTS = '{} with {} already exists, create ignored'
 API_OBJECT_NOT_FOUND = '{} failed because {} with {} not found'
 API_SCHEMA_ERRORS = '{} failed {} due to errors: {}'
+API_RECAPTCHA_FAILS = 'ReCaptcha check failed'
 API_SUCCESS = '{} {} successfully'
 API_FACEBOOK_PROFILE = 'Unable to get required Facebook profile elements'
 
